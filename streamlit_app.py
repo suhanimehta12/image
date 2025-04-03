@@ -10,7 +10,7 @@ def generate_caption(image):
         processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
         model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large")
         
-        # Check if the image is of valid type
+        # Check if the image is valid
         if image is None:
             raise ValueError("Image is None.")
         
@@ -98,7 +98,10 @@ if uploaded_file is not None:
         # Ensure image is valid and open it
         image = Image.open(uploaded_file).convert("RGB")
         st.markdown("<div class='image-container'>", unsafe_allow_html=True)
-        st.image(image, caption="Uploaded Image", use_container_width=True)
+
+        # Removed use_container_width to support older Streamlit versions
+        st.image(image, caption="Uploaded Image")
+
         st.markdown("</div>", unsafe_allow_html=True)
 
         # Info text
@@ -118,5 +121,6 @@ if uploaded_file is not None:
         st.error(f"Error with uploaded image: {str(e)}")
 else:
     st.warning("Please upload an image to get started.")
+
 
 
