@@ -1,5 +1,7 @@
-streamlit==1.18.1
-transformers==4.28.1
-torch==1.13.1
-Pillow==9.0.0
+streamlit>=1.17
+transformers
+torch
+Pillow
+numpy<2
+
 altair==4.2.2  # Add this line
