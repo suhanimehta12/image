@@ -3,18 +3,25 @@ from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 import time
 
-processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
-
+# Function to generate caption from the image
 def generate_caption(image):
-    inputs = processor(image, return_tensors="pt")
-    caption_ids = model.generate(**inputs)
-    caption = processor.batch_decode(caption_ids, skip_special_tokens=True)[0]
-    return caption
+    try:
+        # Load BLIP model and processor (Make sure these models are available and properly loaded)
+        processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
+        model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large")
+        
+        inputs = processor(image, return_tensors="pt")
+        caption_ids = model.generate(**inputs)
+        caption = processor.batch_decode(caption_ids, skip_special_tokens=True)[0]
+        return caption
+    except Exception as e:
+        st.error(f"Error generating caption: {str(e)}")
+        return None
 
-
+# Set page config for better layout
 st.set_page_config(page_title="Image Caption Generator", layout="wide")
 
+# Custom styling for the page
 st.markdown(
     """
     <style>
@@ -70,36 +77,36 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
+# Title header
 st.markdown("<div class='header'> IMAGE NARRATOR</div>", unsafe_allow_html=True)
 
+# Introduction text
 st.markdown("""
-This app generates captions for images. Simply upload an image, and the app will provide a detailed description of what is depicted in the image.
+Used to generate captions for images. Simply upload an image, and the app will provide a detailed description of what is depicted in the image.
 """, unsafe_allow_html=True)
 
+# Image upload widget
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 
+# If an image is uploaded, display it and generate caption
 if uploaded_file is not None:
-
     image = Image.open(uploaded_file).convert("RGB")
-    
-
     st.markdown("<div class='image-container'>", unsafe_allow_html=True)
     st.image(image, caption="Uploaded Image", use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
-    
 
+    # Info text
     st.markdown("<div class='info-text'>Click to generate a description for the image.</div>", unsafe_allow_html=True)
 
+    # Button to generate caption
     if st.button("Generate Caption", key="generate_caption", help="Click to generate a caption for the image", use_container_width=True):
         with st.spinner('Generating caption...'):
-            time.sleep(2)
-            # Generate the caption
             caption = generate_caption(image)
-            # Display the generated caption
-            st.markdown(f"<p class='caption'> Caption: {caption}</p>", unsafe_allow_html=True)
-    else:
-        st.info("Click the button to generate a caption based on the uploaded image.")
+            
+            # If caption is successfully generated, display it
+            if caption:
+                st.markdown(f"<p class='caption'> Caption: {caption}</p>", unsafe_allow_html=True)
+
 else:
     st.warning("Please upload an image to get started.")
 
